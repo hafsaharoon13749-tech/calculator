@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Cutesy Calculator — Fixed</title>
+  <style>
+    :root{
+      --bg1: #fbc2eb;
+      --bg2: #a6c1ee;
+      --card-bg: #fff0f6;
+      --accent: #f48fb1;
+      --button: #f8bbd0;
+      --operator: #ba68c8;
+      --equal: #81c784;
+      --clear: #e57373;
+      --text: #6a0572;
+      --gap: 10px;
+      --calc-width: 340px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .calculator{
+      width: var(--calc-width);
+      background: var(--card-bg);
+      padding: 18px;
+      border-radius: 18px;
+      border: 3px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(90,50,90,0.12);
+    }
+
+    /* Display wrapper to control outer rounding and spacing */
+    .display-wrap{
+      width:100%;
+      padding: 6px;                /* spacing around the input */
+      border-radius: 12px;        /* outer rounding */
+      background: transparent;
+      margin-bottom: 12px;
+    }
+
+    /* Clean display (no inner double border) */
+    #display{
+      width:100%;
+      height: 44px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;               /* remove default border that caused double-border look */
+      outline: none;
+      background: #ffe4f2;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-align: right;
+      pointer-events: none;       /* disables typing/caret (works like a calculator screen) */
+      box-shadow: inset 0 0 0 2px rgba(244,143,177,0.12); /* subtle inner line for style */
+    }
+
+    /* Grid layout ensures equal column widths */
+    .buttons{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--gap);
+    }
+
+    button{
+      width:100%;
+      height: 56px;
+      border-radius: 12px;
+      border: none;
+      background: var(--button);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: transform .08s ease, box-shadow .12s ease;
+      box-shadow: 0 6px 12px rgba(160,80,120,0.08);
+    }
+    button:active{ transform: translateY(2px); }
+
+    button:hover{ box-shadow: 0 10px 20px rgba(160,80,120,0.12); }
+
+    .operator{ background: var(--operator); color: #fff; }
+    .operator:hover{ filter: brightness(.95); }
+
+    .equal{ background: var(--equal); color: #fff; }
+    .equal:hover{ filter: brightness(.95); }
+
+    .clear{ background: var(--clear); color: #fff; }
+    .clear:hover{ filter: brightness(.95); }
+
+    /* keep 0 same size as other buttons */
+    .zero { /* no special span: 0 remains single cell */ }
+
+    /* Responsive small screens (optional) */
+    @media (max-width: 380px){
+      :root{ --calc-width: 300px; }
+      #display{ height:40px; font-size:1.05rem; }
+      button{ height:50px; font-size:1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display-wrap">
+      <input id="display" type="text" disabled />
+    </div>
+
+    <div class="buttons">
+      <!-- Row 1 -->
+      <button class="clear" onclick="clearDisplay()">C</button>
+      <button class="operator" onclick="appendValue('/')">÷</button>
+      <button class="operator" onclick="appendValue('*')">×</button>
+      <button class="operator" onclick="appendValue('-')">−</button>
+
+      <!-- Row 2 -->
+      <button onclick="appendValue('7')">7</button>
+      <button onclick="appendValue('8')">8</button>
+      <button onclick="appendValue('9')">9</button>
+      <button class="operator" onclick="appendValue('+')">+</button>
+
+      <!-- Row 3 -->
+      <button onclick="appendValue('4')">4</button>
+      <button onclick="appendValue('5')">5</button>
+      <button onclick="appendValue('6')">6</button>
+      <button class="equal" onclick="calculate()">=</button>
+
+      <!-- Row 4 -->
+      <button onclick="appendValue('1')">1</button>
+      <button onclick="appendValue('2')">2</button>
+      <button onclick="appendValue('3')">3</button>
+      <button class="zero" onclick="appendValue('0')">0</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+
+    function appendValue(v){
+      // prevent starting with an operator
+      if (display.value === "" && ['+','-','*','/'].includes(v)) return;
+      // prevent two operators in a row
+      const last = display.value.slice(-1);
+      if (['+','-','*','/'].includes(last) && ['+','-','*','/'].includes(v)) return;
+      display.value += v;
+    }
+
+    function clearDisplay(){ display.value = ""; }
+
+    function calculate(){
+      try {
+        // tiny safety: don't run eval if ends with operator
+        const last = display.value.slice(-1);
+        if (['+','-','*','/'].includes(last)) return;
+        display.value = String(eval(display.value));
+      } catch {
+        display.value = "Error";
+      }
+    }
+  </script>
+</body>
+</html>
